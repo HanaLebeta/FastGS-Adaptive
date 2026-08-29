@@ -25,9 +25,9 @@
 </a>
 </p>
 
-**[Hana L. Goshu](mailto:hana-lebeta.goshu@connect.polyu.hk)<sup>1</sup> &nbsp;&middot;&nbsp;
-[Tadesse G. Wakjira](mailto:twakjira@kennesaw.edu)<sup>2</sup> &nbsp;&middot;&nbsp;
-[Kin-Man Lam](mailto:kin.man.lam@polyu.edu.hk)<sup>1</sup>**
+**Hana L. Goshu<sup>1</sup> &nbsp;&middot;&nbsp;
+Tadesse G. Wakjira<sup>2</sup> &nbsp;&middot;&nbsp;
+Kin-Man Lam<sup>1</sup>**
 
 <sup>1</sup> Department of Electrical and Electronic Engineering, The Hong Kong Polytechnic University, Hong Kong
 <sup>2</sup> Department of Civil and Environmental Engineering, Kennesaw State University, Marietta, GA, USA

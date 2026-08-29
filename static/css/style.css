@@ -19,8 +19,7 @@ h2{font-size:1.6rem; font-weight:700; letter-spacing:-.01em; margin:0 0 8px; tex
 .accent{color:var(--accent)}
 .subtitle{margin:10px 0 26px; font-size:1.14rem; color:var(--mut); font-weight:500}
 .authors{font-size:1.04rem; font-weight:600}
-.authors a{color:var(--ink); text-decoration:none; margin:0 10px; border-bottom:1px solid var(--line)}
-.authors a:hover{border-bottom-color:var(--accent); color:var(--accent)}
+.authors span{color:var(--ink); margin:0 10px}
 .affil{margin-top:8px; color:var(--mut); font-size:.9rem}
 .btns{margin:26px 0 8px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap}
 .btn{
