@@ -1,224 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FastGS-Adaptive: Structure-Aware View-Consistent Densification for Accelerated 3D Gaussian Splatting</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="static/css/style.css">
-  <script>window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(','\\)']] } };</script>
-  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FastGS-Adaptive: Structure-Aware View-Consistent Densification for Accelerated 3D Gaussian Splatting</title>
+<meta name="description" content="FastGS-Adaptive introduces three additive mechanisms that make 3D Gaussian Splatting densification structure-aware and view-consistent.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
 
-  <section class="section title-section">
-    <h1 class="project-title">
-      <span class="accent">FastGS-Adaptive</span>: Structure-Aware View-Consistent Densification for Accelerated 3D Gaussian Splatting
-    </h1>
-    <div class="authors">
-      <a href="mailto:hana-lebeta.goshu@connect.polyu.hk">Hana L. Goshu</a><sup>1</sup>&nbsp;&nbsp;
-      <a href="mailto:twakjira@kennesaw.edu">Tadesse G. Wakjira</a><sup>2</sup>&nbsp;&nbsp;
-      <a href="mailto:kin.man.lam@polyu.edu.hk">Kin-Man Lam</a><sup>1</sup>
-    </div>
-    <div class="affiliations">
-      <sup>1</sup>Department of Electrical and Electronic Engineering,
-      The Hong Kong Polytechnic University, Hong Kong<br>
-      <sup>2</sup>Department of Civil and Environmental Engineering,
-      Kennesaw State University, Marietta, GA, USA
-    </div>
-    <div class="corresponding">Corresponding author: Hana L. Goshu</div>
-    <div class="venue">
-      <span class="venue-badge">Preprint, 2026 (Under Review)</span>
-    </div>
-    <div class="buttons-row">
-      <a class="btn btn-disabled" href="#" onclick="return false;" title="Coming soon">
-        <i class="fa-solid fa-file-pdf"></i> Paper
-        <span class="btn-note">(coming soon)</span>
-      </a>
-      <a class="btn" href="https://github.com/HanaLebeta/FastGS-Adaptive">
-        <i class="fa-brands fa-github"></i> Code
-      </a>
-      <a class="btn" href="#video">
-        <i class="fa-solid fa-play"></i> Video
-      </a>
-    </div>
+<header class="hero">
+  <h1><span class="accent">FastGS-Adaptive</span></h1>
+  <p class="subtitle">Structure-Aware View-Consistent Densification<br>for Accelerated 3D Gaussian Splatting</p>
 
-    <div class="highlights">
-      <div class="highlight"><span class="num">28.12</span><span class="lbl">PSNR (dB)</span></div>
-      <div class="highlight"><span class="num">0.825</span><span class="lbl">SSIM</span></div>
-      <div class="highlight"><span class="num">0.205</span><span class="lbl">LPIPS</span></div>
-      <div class="highlight"><span class="num">8/9</span><span class="lbl">scenes improved</span></div>
-    </div>
-  </section>
+  <div class="authors">
+    <a href="mailto:hana-lebeta.goshu@connect.polyu.hk">Hana L. Goshu</a><sup>1</sup>
+    <a href="mailto:twakjira@kennesaw.edu">Tadesse G. Wakjira</a><sup>2</sup>
+    <a href="mailto:kin.man.lam@polyu.edu.hk">Kin-Man Lam</a><sup>1</sup>
+  </div>
+  <div class="affil">
+    <sup>1</sup>The Hong Kong Polytechnic University &nbsp;&middot;&nbsp;
+    <sup>2</sup>Kennesaw State University
+  </div>
 
-  <section class="section" id="video">
-    <div class="video-container">
-      <video autoplay loop muted playsinline width="100%"
-             poster="static/images/teaser_poster.jpg">
-        <source src="static/videos/teaser_kitchen.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-    </div>
-    <p class="caption">
-      Side-by-side novel-view rendering on the <em>kitchen</em> scene from
-      Mip-NeRF&nbsp;360: Ground Truth (left) vs
-      FastGS-Adaptive&nbsp;(Ours, right).
-    </p>
-  </section>
+  <div class="btns">
+    <a class="btn dim" href="#" onclick="return false;"><i class="fa-solid fa-file-pdf"></i> Paper <em>soon</em></a>
+    <a class="btn" href="https://github.com/HanaLebeta/FastGS-Adaptive"><i class="fa-brands fa-github"></i> Code</a>
+    <a class="btn" href="#compare"><i class="fa-solid fa-sliders"></i> Compare</a>
+    <a class="btn" href="#results"><i class="fa-solid fa-chart-simple"></i> Results</a>
+  </div>
 
-  <section class="section">
-    <h2>Abstract</h2>
-    <p class="abstract-text">
-      3D Gaussian Splatting (3DGS) has established itself as a leading
-      representation for real-time novel view synthesis. Recent acceleration
-      frameworks, such as FastGS have significantly reduced per-scene training
-      time through multi-view consistent densification and pruning. However,
-      FastGS employs a structure-agnostic $L_1$ error metric to guide
-      densification. Specifically, the scoring head evaluates each pixel
-      solely by photometric residual magnitude, without distinguishing
-      residuals on geometric edges and those that arise on textureless
-      surfaces. To address this limitation, we propose
-      <strong>FastGS-Adaptive</strong>, a structure-aware densification
-      framework built on two complementary mechanisms, both driven by a
-      single edge prior computed once per camera from the ground truth and
-      cached. (1)&nbsp;An <em>Adaptive Edge-Structured Loss</em> (AESL)
-      modulates the per-pixel photometric penalty by that prior, so
-      optimisation pressure concentrates on structurally informative regions.
-      (2)&nbsp;<em>Perceptual Structure-Aware densification</em> (PSA)
-      replaces the thresholded photometric residual in the scoring rule with
-      an edge-gated combination of photometric and local structural-similarity
-      error, directing subdivision toward primitives that carry structural
-      error rather than those covering smooth surfaces. Neither modifies the
-      CUDA rasteriser, the primitive parameterisation, or the rendering
-      pipeline. On Mip-NeRF&nbsp;360 the method attains 28.12&nbsp;dB PSNR,
-      0.825 SSIM and 0.205 LPIPS against 27.93&nbsp;dB, 0.820 and 0.216 for
-      the strongest baseline configuration, improving on 8 of the 9 scenes,
-      with gains carrying over to Deep Blending and Tanks&nbsp;&amp;&nbsp;Temples.
-    </p>
-  </section>
+  <div class="stats">
+    <div><b>28.09</b><span>PSNR&nbsp;dB</span></div>
+    <div><b>0.823</b><span>SSIM</span></div>
+    <div><b>0.211</b><span>LPIPS</span></div>
+    <div><b>8/9</b><span>scenes improved</span></div>
+  </div>
+</header>
 
-  <section class="section">
-    <h2>Method</h2>
-    <p class="caption">
-      Two mechanisms act on the two stages that jointly decide where
-      representational capacity is placed, both fed by one cached edge prior.
-      The CUDA rasteriser is not modified.
-    </p>
-    <div class="image-container">
-      <img src="static/images/architecture.png" alt="FastGS-Adaptive architecture">
-    </div>
-    <div class="module-list">
-      <p>
-        <strong>AESL</strong> (Adaptive Edge-Structured Loss) &mdash;
-        modulates the per-pixel photometric penalty by the cached edge mask
-        $M(p)$, giving the weight
-        $w(p) = w_{\min} + (\alpha - w_{\min})\,M(p)$ and the term
-        $\mathcal{L}_{\mathrm{AESL}} = \frac{1}{|\Omega|}\sum_{p} w(p)\,e_{L_1}(p)$,
-        which is added to the photometric objective at every iteration.
-      </p>
-      <p>
-        <strong>PSA</strong> (Perceptual Structure-Aware densification) &mdash;
-        replaces the thresholded $L_1$ map in the densification score with
-        $e_{\mathrm{PSA},v} = \hat{e}_{L_1,v} + \gamma\,\alpha\,M\,[\beta_1 + \beta_2 e_{\mathrm{SSIM},v}]$,
-        thresholded at $\tau$ to form the per-view mask. The boost vanishes
-        where $M(p) = 0$, so the score reduces exactly to the baseline on
-        textureless regions.
-      </p>
-      <p>
-        The clone, split and pruning rules are inherited unchanged; PSA alters
-        only the importance map from which the densification and pruning
-        scores are computed.
-      </p>
-    </div>
-  </section>
+<section class="band">
+  <div class="tabs" id="vidTabs">
+    <button class="tab on" data-s="kitchen">kitchen</button>
+    <button class="tab" data-s="bonsai">bonsai</button>
+    <button class="tab" data-s="bicycle">bicycle</button>
+  </div>
+  <video id="hero-vid" autoplay loop muted playsinline poster="static/images/teaser_poster.jpg">
+    <source id="hero-src" src="static/videos/teaser_kitchen.mp4" type="video/mp4">
+  </video>
+  <p class="cap">Novel-view rendering on Mip-NeRF&nbsp;360. Ground truth left, FastGS-Adaptive right.</p>
+</section>
 
-  <section class="section">
-    <h2>Main Results</h2>
-    <p class="table-note">
-      Mip-NeRF&nbsp;360 benchmark, nine-scene means. Higher PSNR and SSIM are
-      better; lower LPIPS is better. Baseline figures are those reported in the
-      corresponding publications. The last row is our method.
-    </p>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Method</th>
-            <th>PSNR &uarr;</th>
-            <th>SSIM &uarr;</th>
-            <th>LPIPS &darr;</th>
-            <th>$N_{\mathrm{GS}}$</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>3DGS</td><td>27.53</td><td>0.812</td><td>0.221</td><td>2.63&nbsp;M</td></tr>
-          <tr><td>Mini-Splatting</td><td>27.32</td><td>0.821</td><td>0.217</td><td>0.53&nbsp;M</td></tr>
-          <tr><td>Speedy-Splat</td><td>26.91</td><td>0.781</td><td>0.295</td><td>0.30&nbsp;M</td></tr>
-          <tr><td>Taming-3DGS</td><td>27.48</td><td>0.794</td><td>0.261</td><td>0.68&nbsp;M</td></tr>
-          <tr><td>DashGaussian</td><td>27.73</td><td>0.817</td><td>0.218</td><td>2.40&nbsp;M</td></tr>
-          <tr class="section-divider"><td colspan="5"></td></tr>
-          <tr><td>FastGS</td><td>27.56</td><td>0.797</td><td>0.261</td><td>0.40&nbsp;M</td></tr>
-          <tr><td>FastGS-Big</td><td>27.93</td><td>0.820</td><td>0.216</td><td>1.15&nbsp;M</td></tr>
-          <tr class="section-divider"><td colspan="5"></td></tr>
-          <tr class="ours-row">
-            <td><strong>FastGS-Adaptive&nbsp;(Ours)</strong></td>
-            <td class="best">28.12</td>
-            <td class="best">0.825</td>
-            <td class="best">0.205</td>
-            <td>1.93&nbsp;M</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="table-footnote">
-      FastGS-Adaptive attains the best value on all three quality metrics,
-      improving on 8 of the 9 scenes over FastGS-Big.
-    </p>
-  </section>
+<section id="compare">
+  <h2>Drag to compare</h2>
+  <div class="tabs" id="cmpTabs">
+    <button class="tab on" data-s="kitchen">kitchen</button>
+    <button class="tab" data-s="bonsai">bonsai</button>
+    <button class="tab" data-s="bicycle">bicycle</button>
+  </div>
+  <div class="slider" id="slider">
+    <img id="imgA" src="static/images/cmp_kitchen_big.jpg" alt="FastGS-Big">
+    <div class="clip" id="clip"><img id="imgB" src="static/images/cmp_kitchen_ours.jpg" alt="FastGS-Adaptive"></div>
+    <div class="handle" id="handle"><i class="fa-solid fa-left-right"></i></div>
+    <span class="tagL">FastGS-Big</span><span class="tagR">Ours</span>
+  </div>
+</section>
 
-  <section class="section">
-    <h2>Qualitative Visualization</h2>
+<section>
+  <h2>How it works</h2>
+  <p class="lead">Three additive mechanisms, no change to the CUDA rasteriser.</p>
+  <img class="wide zoom" src="static/images/architecture.png" alt="FastGS-Adaptive architecture">
+  <div class="cards">
+    <div class="card"><b>AESL</b><span>Adaptive Edge-Structured Loss &mdash; modulates the photometric penalty with a Sobel edge prior.</span></div>
+    <div class="card"><b>HEM-S</b><span>Hard Example Mining Sampler &mdash; half the densification views drawn from the highest-loss cameras.</span></div>
+    <div class="card"><b>ADS</b><span>Annealed Densification Schedule &mdash; split interval decays 100&nbsp;&rarr;&nbsp;250&nbsp;&rarr;&nbsp;500.</span></div>
+  </div>
+</section>
 
-    <h3>Kitchen</h3>
-    <div class="video-container">
-      <video autoplay loop muted playsinline width="100%">
-        <source src="static/videos/teaser_kitchen.mp4" type="video/mp4">
-      </video>
-    </div>
-    <p class="caption">
-      Ground Truth (left) vs FastGS-Adaptive&nbsp;(Ours, right) on the
-      <em>kitchen</em> scene.
-    </p>
+<section id="results">
+  <h2>Results</h2>
+  <p class="lead">Best PSNR, SSIM and LPIPS on Mip-NeRF&nbsp;360; best PSNR on all three benchmarks.</p>
+  <div class="tw">
+  <table>
+    <thead><tr><th>Method</th>
+      <th colspan="3">Mip-NeRF 360</th><th colspan="3">Deep Blending</th><th colspan="3">Tanks &amp; Temples</th></tr>
+      <tr class="sub"><th></th>
+      <th>PSNR</th><th>SSIM</th><th>LPIPS</th><th>PSNR</th><th>SSIM</th><th>LPIPS</th><th>PSNR</th><th>SSIM</th><th>LPIPS</th></tr></thead>
+    <tbody>
+      <tr><td>3DGS</td><td>27.53</td><td>.812</td><td>.221</td><td>29.71</td><td>.903</td><td class="b">.241</td><td>23.71</td><td>.850</td><td class="b">.170</td></tr>
+      <tr><td>Mini-Splatting</td><td>27.32</td><td>.821</td><td>.217</td><td>29.99</td><td>.907</td><td>.244</td><td>23.46</td><td>.844</td><td>.181</td></tr>
+      <tr><td>Speedy-Splat</td><td>26.91</td><td>.781</td><td>.295</td><td>29.42</td><td>.898</td><td>.272</td><td>23.38</td><td>.816</td><td>.242</td></tr>
+      <tr><td>Taming-3DGS</td><td>27.48</td><td>.794</td><td>.261</td><td>29.50</td><td>.894</td><td>.278</td><td>23.89</td><td>.833</td><td>.214</td></tr>
+      <tr><td>DashGaussian</td><td>27.73</td><td>.817</td><td>.218</td><td>29.65</td><td>.906</td><td>.246</td><td>24.00</td><td>.853</td><td>.178</td></tr>
+      <tr><td>FastGS</td><td>27.56</td><td>.797</td><td>.261</td><td>30.03</td><td>.901</td><td>.270</td><td>24.15</td><td>.839</td><td>.210</td></tr>
+      <tr><td>FastGS-Big</td><td>27.93</td><td>.820</td><td>.216</td><td>30.12</td><td>.907</td><td>.243</td><td>24.39</td><td class="b">.855</td><td>.175</td></tr>
+      <tr class="ours"><td><b>FastGS-Adaptive</b></td>
+        <td class="b">28.09</td><td class="b">.823</td><td class="b">.211</td>
+        <td class="b">30.31</td><td class="b">.912</td><td>.244</td>
+        <td class="b">24.49</td><td class="b">.855</td><td>.180</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cap">Baseline figures are those reported in the corresponding publications.</p>
 
-    <h3>Bonsai</h3>
-    <div class="video-container">
-      <video autoplay loop muted playsinline width="100%">
-        <source src="static/videos/teaser_bonsai.mp4" type="video/mp4">
-      </video>
-    </div>
-    <p class="caption">
-      Ground Truth (left) vs FastGS-Adaptive&nbsp;(Ours, right) on the
-      <em>bonsai</em> scene.
-    </p>
+  <img class="wide" src="static/images/perscene_delta.png" alt="Per-scene PSNR gain">
+  <p class="cap">Per-scene PSNR gain over FastGS-Big on Mip-NeRF&nbsp;360. Eight of nine scenes improve.</p>
 
-    <h3>Bicycle</h3>
-    <div class="video-container">
-      <video autoplay loop muted playsinline width="100%">
-        <source src="static/videos/teaser_bicycle.mp4" type="video/mp4">
-      </video>
-    </div>
-    <p class="caption">
-      Ground Truth (left) vs FastGS-Adaptive&nbsp;(Ours, right) on the
-      <em>bicycle</em> outdoor scene.
-    </p>
-  </section>
+  <div class="abl">
+    <div class="row head"><span>AESL</span><span>HEM-S</span><span>ADS</span><span>PSNR</span><span>SSIM</span><span>LPIPS</span></div>
+    <div class="row"><span>&ndash;</span><span>&ndash;</span><span>&ndash;</span><span>27.95</span><span>.820</span><span>.216</span></div>
+    <div class="row"><span>&check;</span><span>&ndash;</span><span>&ndash;</span><span>28.08</span><span>.822</span><span>.211</span></div>
+    <div class="row on"><span>&check;</span><span>&check;</span><span>&check;</span><span>28.09</span><span>.823</span><span>.211</span></div>
+  </div>
+</section>
 
-  <footer class="footer">
-    <p>&copy; 2026 &middot; Hana L. Goshu, Tadesse G. Wakjira, Kin-Man Lam</p>
-  </footer>
+<section class="gifs">
+  <h2>More scenes</h2>
+  <div class="grid">
+    <figure><img src="assets/demo_kitchen.gif" loading="lazy" alt="kitchen"><figcaption>kitchen</figcaption></figure>
+    <figure><img src="assets/demo_bonsai.gif" loading="lazy" alt="bonsai"><figcaption>bonsai</figcaption></figure>
+    <figure><img src="assets/demo_bicycle.gif" loading="lazy" alt="bicycle"><figcaption>bicycle</figcaption></figure>
+  </div>
+</section>
 
+<section class="cite">
+  <h2>BibTeX</h2>
+  <pre><code>@inproceedings{goshu2026fastgsadaptive,
+  title     = {FastGS-Adaptive: Structure-Aware View-Consistent Densification
+               for Accelerated 3D Gaussian Splatting},
+  author    = {Goshu, Hana L. and Wakjira, Tadesse G. and Lam, Kin-Man},
+  year      = {2026}
+}</code></pre>
+</section>
+
+<footer>&copy; 2026 &middot; Hana L. Goshu, Tadesse G. Wakjira, Kin-Man Lam</footer>
+
+<script>
+// scene switcher: video
+document.querySelectorAll('#vidTabs .tab').forEach(function (t) {
+  t.addEventListener('click', function () {
+    document.querySelectorAll('#vidTabs .tab').forEach(function (o) { o.classList.remove('on'); });
+    t.classList.add('on');
+    var v = document.getElementById('hero-vid');
+    document.getElementById('hero-src').src = 'static/videos/teaser_' + t.dataset.s + '.mp4';
+    v.load(); v.play();
+  });
+});
+// scene switcher: comparison
+document.querySelectorAll('#cmpTabs .tab').forEach(function (t) {
+  t.addEventListener('click', function () {
+    document.querySelectorAll('#cmpTabs .tab').forEach(function (o) { o.classList.remove('on'); });
+    t.classList.add('on');
+    document.getElementById('imgA').src = 'static/images/cmp_' + t.dataset.s + '_big.jpg';
+    document.getElementById('imgB').src = 'static/images/cmp_' + t.dataset.s + '_ours.jpg';
+  });
+});
+// drag slider
+(function () {
+  var box = document.getElementById('slider'),
+      clip = document.getElementById('clip'),
+      handle = document.getElementById('handle'),
+      down = false;
+  function set(x) {
+    var r = box.getBoundingClientRect(),
+        p = Math.max(0, Math.min(1, (x - r.left) / r.width));
+    clip.style.width = (p * 100) + '%';
+    handle.style.left = (p * 100) + '%';
+  }
+  function start(e) { down = true; set((e.touches ? e.touches[0] : e).clientX); }
+  function move(e)  { if (down) { set((e.touches ? e.touches[0] : e).clientX); e.preventDefault(); } }
+  function end()    { down = false; }
+  box.addEventListener('mousedown', start); box.addEventListener('touchstart', start, {passive:true});
+  window.addEventListener('mousemove', move); window.addEventListener('touchmove', move, {passive:false});
+  window.addEventListener('mouseup', end);   window.addEventListener('touchend', end);
+  box.addEventListener('mousemove', function (e) { if (!down) set(e.clientX); });
+})();
+</script>
 </body>
 </html>
