@@ -62,16 +62,14 @@
     <button class="tab" data-s="bicycle">bicycle</button>
   </div>
   <div class="slider" id="slider">
-    <img id="imgA" src="static/images/cmp_kitchen_big.jpg" alt="FastGS-Big">
-    <div class="clip" id="clip"><img id="imgB" src="static/images/cmp_kitchen_ours.jpg" alt="FastGS-Adaptive"></div>
+    <img id="imgA" src="static/images/cmp_kitchen_ours.jpg" alt="FastGS-Adaptive">
+    <div class="clip" id="clip"><img id="imgB" src="static/images/cmp_kitchen_big.jpg" alt="FastGS-Big"></div>
     <div class="handle" id="handle"><i class="fa-solid fa-left-right"></i></div>
     <span class="tagL">FastGS-Big</span><span class="tagR">Ours</span>
   </div>
 </section>
 
 <section>
-  <h2>How it works</h2>
-  <p class="lead">Three additive mechanisms, no change to the CUDA rasteriser.</p>
   <img class="wide zoom" src="static/images/architecture.png" alt="FastGS-Adaptive architecture">
   <div class="cards">
     <div class="card"><b>AESL</b><span>Adaptive Edge-Structured Loss &mdash; modulates the photometric penalty with a Sobel edge prior.</span></div>
@@ -154,8 +152,8 @@ document.querySelectorAll('#cmpTabs .tab').forEach(function (t) {
   t.addEventListener('click', function () {
     document.querySelectorAll('#cmpTabs .tab').forEach(function (o) { o.classList.remove('on'); });
     t.classList.add('on');
-    document.getElementById('imgA').src = 'static/images/cmp_' + t.dataset.s + '_big.jpg';
-    document.getElementById('imgB').src = 'static/images/cmp_' + t.dataset.s + '_ours.jpg';
+    document.getElementById('imgA').src = 'static/images/cmp_' + t.dataset.s + '_ours.jpg';
+    document.getElementById('imgB').src = 'static/images/cmp_' + t.dataset.s + '_big.jpg';
   });
 });
 // drag slider
