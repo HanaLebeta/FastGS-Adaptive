@@ -72,9 +72,8 @@
 <section>
   <img class="wide zoom" src="static/images/architecture.png" alt="FastGS-Adaptive architecture">
   <div class="cards">
-    <div class="card"><b>AESL</b><span>Adaptive Edge-Structured Loss &mdash; modulates the photometric penalty with a Sobel edge prior.</span></div>
-    <div class="card"><b>HEM-S</b><span>Hard Example Mining Sampler &mdash; half the densification views drawn from the highest-loss cameras.</span></div>
-    <div class="card"><b>ADS</b><span>Annealed Densification Schedule &mdash; split interval decays 100&nbsp;&rarr;&nbsp;250&nbsp;&rarr;&nbsp;500.</span></div>
+    <div class="card"><b>AESL</b><span>Adaptive Edge-Structured Loss &mdash; modulates the per-pixel photometric penalty with a Sobel edge prior cached once per camera.</span></div>
+    <div class="card"><b>PSA</b><span>Perceptual Structure-Aware densification &mdash; replaces the thresholded residual in the scoring rule with an edge-gated combination of photometric and local SSIM error.</span></div>
   </div>
 </section>
 
@@ -107,12 +106,6 @@
   <img class="wide" src="static/images/perscene_delta.png" alt="Per-scene PSNR gain">
   <p class="cap">Per-scene PSNR gain over FastGS-Big on Mip-NeRF&nbsp;360. Eight of nine scenes improve.</p>
 
-  <div class="abl">
-    <div class="row head"><span>AESL</span><span>HEM-S</span><span>ADS</span><span>PSNR</span><span>SSIM</span><span>LPIPS</span></div>
-    <div class="row"><span>&ndash;</span><span>&ndash;</span><span>&ndash;</span><span>27.95</span><span>.820</span><span>.216</span></div>
-    <div class="row"><span>&check;</span><span>&ndash;</span><span>&ndash;</span><span>28.08</span><span>.822</span><span>.211</span></div>
-    <div class="row on"><span>&check;</span><span>&check;</span><span>&check;</span><span>28.09</span><span>.823</span><span>.211</span></div>
-  </div>
 </section>
 
 <section class="gifs">
