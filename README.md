@@ -29,10 +29,8 @@
 Tadesse G. Wakjira<sup>2</sup> &nbsp;&middot;&nbsp;
 Kin-Man Lam<sup>1</sup>**
 
-<sup>1</sup> Department of Electrical and Electronic Engineering, The Hong Kong Polytechnic University, Hong Kong
-<sup>2</sup> Department of Civil and Environmental Engineering, Kennesaw State University, Marietta, GA, USA
-
-*Preprint, 2026 (Under Review)*
+<sup>1</sup> The Hong Kong Polytechnic University &nbsp;&middot;&nbsp;
+<sup>2</sup> Kennesaw State University
 
 </div>
 
