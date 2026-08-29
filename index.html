@@ -177,6 +177,12 @@ document.querySelectorAll('#cmpTabs .tab').forEach(function (t) {
   window.addEventListener('mousemove', move); window.addEventListener('touchmove', move, {passive:false});
   window.addEventListener('mouseup', end);   window.addEventListener('touchend', end);
   box.addEventListener('mousemove', function (e) { if (!down) set(e.clientX); });
+  // the clipped image must span the full slider, not the clip
+  function fit() { document.getElementById('imgB').style.width = box.offsetWidth + 'px'; }
+  window.addEventListener('resize', fit);
+  document.getElementById('imgA').addEventListener('load', fit);
+  if (document.readyState !== 'loading') fit(); else document.addEventListener('DOMContentLoaded', fit);
+  set(box.getBoundingClientRect().left + box.offsetWidth / 2);
 })();
 </script>
 </body>
