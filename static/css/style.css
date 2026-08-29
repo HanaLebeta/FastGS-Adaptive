@@ -276,3 +276,22 @@ tbody tr:hover { background: #fafafa; }
   .btn { padding: 0.45rem 0.9rem; font-size: 0.88rem; }
   .highlights { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* author block */
+.authors a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+}
+.authors a:hover { border-bottom-color: currentColor; }
+.affiliations {
+  margin-top: 0.6rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  opacity: 0.75;
+}
+.corresponding {
+  margin-top: 0.35rem;
+  font-size: 0.86rem;
+  opacity: 0.6;
+}

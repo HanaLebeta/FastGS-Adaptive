@@ -22,7 +22,12 @@
 </a>
 </p>
 
-**Anonymous Authors**
+**[Hana L. Goshu](mailto:hana-lebeta.goshu@connect.polyu.hk)<sup>1</sup> &nbsp;&middot;&nbsp;
+[Tadesse G. Wakjira](mailto:twakjira@kennesaw.edu)<sup>2</sup> &nbsp;&middot;&nbsp;
+[Kin-Man Lam](mailto:kin.man.lam@polyu.edu.hk)<sup>1</sup>**
+
+<sup>1</sup> Department of Electrical and Electronic Engineering, The Hong Kong Polytechnic University, Hong Kong
+<sup>2</sup> Department of Civil and Environmental Engineering, Kennesaw State University, Marietta, GA, USA
 
 *Preprint, 2026 (Under Review)*
 
@@ -35,7 +40,7 @@
 <div align="center">
 <img src="static/images/architecture.png" width="95%">
 <br>
-<em>Model architecture of FastGS-Adaptive with four additive modules (AESL, HEM-S, ADS, PSA-VCD) that make densification structure-aware and view-consistent.</em>
+<em>FastGS-Adaptive. Two mechanisms, an adaptive edge-structured loss (AESL) and perceptual structure-aware densification (PSA), introduce image structure into the photometric objective and the densification scoring rule respectively, both driven by a single edge prior cached once per camera.</em>
 </div>
 
 ---
@@ -62,7 +67,47 @@
 
 ## Abstract
 
-3D Gaussian Splatting (3DGS) has established itself as a leading representation for real-time novel view synthesis. Recent acceleration frameworks, such as FastGS have significantly reduced per-scene training time through multi-view consistent densification and pruning. However, FastGS employs a structure-agnostic *L<sub>1</sub>* error metric to guide densification. Specifically, the scoring head evaluates each pixel solely by photometric residual magnitude, without distinguishing residuals on geometric edges and those that arise on textureless surfaces. To address this limitation, we propose **FastGS-Adaptive**, a structure-aware densification framework that introduces four additive mechanisms: (1) an *Adaptive Edge-Structured Loss* (AESL) that modulates the photometric penalty using Sobel-derived gradient priors; (2) a *Hard Example Mining Sampler* (HEM-S) that replaces uniform camera selection with a loss-history-biased policy to focus densification capacity on under-reconstructed views; (3) an *Annealed Densification Schedule* (ADS) that decays the split frequency across three phases to eliminate late-stage overhead; and (4) a *Perceptual Structure-Aware VCD score* (PSA-VCD) that augments the *L<sub>1</sub>*-based importance map with edge-weighted local SSIM error to bias split decisions toward perceptually salient regions. Experimental evaluation demonstrates that FastGS-Adaptive surpasses existing state-of-the-art acceleration methods on all three standard quality metrics while also rendering substantially faster at inference.
+3D Gaussian Splatting (3DGS) is the dominant representation for real-time novel view synthesis,
+and recent frameworks such as FastGS have cut per-scene training from tens of minutes to a few
+through multi-view consistent densification and pruning. In the fastest of these, primitives are
+selected for subdivision by counting photometric residuals above a fixed threshold within their
+footprints. Neither that criterion nor the objective producing the residuals accounts for image
+structure, so a residual on a thin geometric edge is treated like one on a flat surface: primitives
+are added where they yield little benefit while fine structure stays under-represented.
+
+We propose **FastGS-Adaptive**, a structure-aware densification framework built on two
+complementary mechanisms, both driven by a single edge prior computed once per camera from the
+ground truth and cached.
+
+- **AESL** (Adaptive Edge-Structured Loss) modulates the per-pixel photometric penalty by that
+  prior, concentrating optimisation pressure on structurally informative regions.
+- **PSA** (Perceptual Structure-Aware densification) replaces the thresholded photometric residual
+  in the scoring rule with an edge-gated combination of photometric and local structural-similarity
+  error, directing subdivision toward primitives carrying structural error rather than those
+  covering smooth surfaces.
+
+Neither modifies the CUDA rasteriser, the primitive parameterisation, or the rendering pipeline.
+On Mip-NeRF 360 the method attains **28.12 dB PSNR, 0.825 SSIM and 0.205 LPIPS** against 27.93 dB,
+0.820 and 0.216 for the strongest baseline configuration, improving on 8 of the 9 scenes, with
+gains carrying over to Deep Blending and Tanks & Temples.
+
+## Results
+
+Mip-NeRF 360, nine-scene means. Baseline figures are those reported in the corresponding
+publications.
+
+| Method | PSNR &uarr; | SSIM &uarr; | LPIPS &darr; | Primitives |
+|---|---|---|---|---|
+| 3DGS | 27.53 | .812 | .221 | 2.63 M |
+| Mini-Splatting | 27.32 | .821 | .217 | 0.53 M |
+| Speedy-Splat | 26.91 | .781 | .295 | 0.30 M |
+| Taming-3DGS | 27.48 | .794 | .261 | 0.68 M |
+| DashGaussian | 27.73 | .817 | .218 | 2.40 M |
+| FastGS | 27.56 | .797 | .261 | 0.40 M |
+| FastGS-Big | 27.93 | .820 | .216 | 1.15 M |
+| **FastGS-Adaptive (ours)** | **28.12** | **.825** | **.205** | 1.93 M |
+
+Training cost is 1.29x FastGS-Big, which remains below every other method compared.
 
 ## Setup
 
@@ -118,7 +163,7 @@ arguments/           CLI / config dataclasses
 gaussian_renderer/   FastGS rasteriser wrapper + network GUI
 lpipsPyTorch/        LPIPS metric (perceptual similarity)
 scene/               COLMAP loader, dataset readers, Gaussian model
-utils/               loss, edge mask, hard-example mining, PSA-VCD scoring
+utils/               loss, cached edge mask, PSA densification scoring
 train.py             training entry point (FastGS-Adaptive)
 render.py            per-scene novel-view rendering
 metrics.py           PSNR / SSIM / LPIPS evaluation

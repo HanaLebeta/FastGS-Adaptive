@@ -18,7 +18,18 @@
     <h1 class="project-title">
       <span class="accent">FastGS-Adaptive</span>: Structure-Aware View-Consistent Densification for Accelerated 3D Gaussian Splatting
     </h1>
-    <div class="authors">Anonymous Authors</div>
+    <div class="authors">
+      <a href="mailto:hana-lebeta.goshu@connect.polyu.hk">Hana L. Goshu</a><sup>1</sup>&nbsp;&nbsp;
+      <a href="mailto:twakjira@kennesaw.edu">Tadesse G. Wakjira</a><sup>2</sup>&nbsp;&nbsp;
+      <a href="mailto:kin.man.lam@polyu.edu.hk">Kin-Man Lam</a><sup>1</sup>
+    </div>
+    <div class="affiliations">
+      <sup>1</sup>Department of Electrical and Electronic Engineering,
+      The Hong Kong Polytechnic University, Hong Kong<br>
+      <sup>2</sup>Department of Civil and Environmental Engineering,
+      Kennesaw State University, Marietta, GA, USA
+    </div>
+    <div class="corresponding">Corresponding author: Hana L. Goshu</div>
     <div class="venue">
       <span class="venue-badge">Preprint, 2026 (Under Review)</span>
     </div>
@@ -27,9 +38,8 @@
         <i class="fa-solid fa-file-pdf"></i> Paper
         <span class="btn-note">(coming soon)</span>
       </a>
-      <a class="btn btn-disabled" href="#" onclick="return false;" title="Coming soon">
+      <a class="btn" href="https://github.com/HanaLebeta/FastGS-Adaptive">
         <i class="fa-brands fa-github"></i> Code
-        <span class="btn-note">(coming soon)</span>
       </a>
       <a class="btn" href="#video">
         <i class="fa-solid fa-play"></i> Video
@@ -37,10 +47,10 @@
     </div>
 
     <div class="highlights">
-      <div class="highlight"><span class="num">28.09</span><span class="lbl">PSNR (dB)</span></div>
-      <div class="highlight"><span class="num">0.823</span><span class="lbl">SSIM</span></div>
-      <div class="highlight"><span class="num">0.211</span><span class="lbl">LPIPS</span></div>
-      <div class="highlight"><span class="num">689</span><span class="lbl">FPS</span></div>
+      <div class="highlight"><span class="num">28.12</span><span class="lbl">PSNR (dB)</span></div>
+      <div class="highlight"><span class="num">0.825</span><span class="lbl">SSIM</span></div>
+      <div class="highlight"><span class="num">0.205</span><span class="lbl">LPIPS</span></div>
+      <div class="highlight"><span class="num">8/9</span><span class="lbl">scenes improved</span></div>
     </div>
   </section>
 
@@ -72,29 +82,30 @@
       residuals on geometric edges and those that arise on textureless
       surfaces. To address this limitation, we propose
       <strong>FastGS-Adaptive</strong>, a structure-aware densification
-      framework that introduces four additive mechanisms: (1)&nbsp;an
-      <em>Adaptive Edge-Structured Loss</em> (AESL) that modulates the
-      photometric penalty using Sobel-derived gradient priors;
-      (2)&nbsp;a <em>Hard Example Mining Sampler</em> (HEM-S) that replaces
-      uniform camera selection with a loss-history-biased policy to focus
-      densification capacity on under-reconstructed views;
-      (3)&nbsp;an <em>Annealed Densification Schedule</em> (ADS) that decays
-      the split frequency across three phases to eliminate late-stage
-      overhead; and (4)&nbsp;a <em>Perceptual Structure-Aware VCD score</em>
-      (PSA-VCD) that augments the $L_1$-based importance map with
-      edge-weighted local SSIM error to bias split decisions toward
-      perceptually salient regions. Experimental evaluation demonstrates that
-      FastGS-Adaptive surpasses existing state-of-the-art acceleration methods
-      on all three standard quality metrics while also rendering substantially
-      faster at inference.
+      framework built on two complementary mechanisms, both driven by a
+      single edge prior computed once per camera from the ground truth and
+      cached. (1)&nbsp;An <em>Adaptive Edge-Structured Loss</em> (AESL)
+      modulates the per-pixel photometric penalty by that prior, so
+      optimisation pressure concentrates on structurally informative regions.
+      (2)&nbsp;<em>Perceptual Structure-Aware densification</em> (PSA)
+      replaces the thresholded photometric residual in the scoring rule with
+      an edge-gated combination of photometric and local structural-similarity
+      error, directing subdivision toward primitives that carry structural
+      error rather than those covering smooth surfaces. Neither modifies the
+      CUDA rasteriser, the primitive parameterisation, or the rendering
+      pipeline. On Mip-NeRF&nbsp;360 the method attains 28.12&nbsp;dB PSNR,
+      0.825 SSIM and 0.205 LPIPS against 27.93&nbsp;dB, 0.820 and 0.216 for
+      the strongest baseline configuration, improving on 8 of the 9 scenes,
+      with gains carrying over to Deep Blending and Tanks&nbsp;&amp;&nbsp;Temples.
     </p>
   </section>
 
   <section class="section">
     <h2>Method</h2>
     <p class="caption">
-      FastGS-Adaptive layers four additive modules onto the FastGS pipeline
-      without modifying the CUDA rasteriser.
+      Two mechanisms act on the two stages that jointly decide where
+      representational capacity is placed, both fed by one cached edge prior.
+      The CUDA rasteriser is not modified.
     </p>
     <div class="image-container">
       <img src="static/images/architecture.png" alt="FastGS-Adaptive architecture">
@@ -102,26 +113,24 @@
     <div class="module-list">
       <p>
         <strong>AESL</strong> (Adaptive Edge-Structured Loss) &mdash;
-        modulates the per-pixel photometric penalty using a Sobel-derived
-        edge mask $M(p)$ with weight
-        $w(p) = w_{\min} + (\alpha - w_{\min})\,M(p)$.
+        modulates the per-pixel photometric penalty by the cached edge mask
+        $M(p)$, giving the weight
+        $w(p) = w_{\min} + (\alpha - w_{\min})\,M(p)$ and the term
+        $\mathcal{L}_{\mathrm{AESL}} = \frac{1}{|\Omega|}\sum_{p} w(p)\,e_{L_1}(p)$,
+        which is added to the photometric objective at every iteration.
       </p>
       <p>
-        <strong>HEM-S</strong> (Hard Example Mining Sampler) &mdash;
-        replaces uniform view sampling with a 50%-high-loss / 50%-random
-        policy driven by a per-camera loss history $\mathcal{H}[v]$.
+        <strong>PSA</strong> (Perceptual Structure-Aware densification) &mdash;
+        replaces the thresholded $L_1$ map in the densification score with
+        $e_{\mathrm{PSA},v} = \hat{e}_{L_1,v} + \gamma\,\alpha\,M\,[\beta_1 + \beta_2 e_{\mathrm{SSIM},v}]$,
+        thresholded at $\tau$ to form the per-view mask. The boost vanishes
+        where $M(p) = 0$, so the score reduces exactly to the baseline on
+        textureless regions.
       </p>
       <p>
-        <strong>ADS</strong> (Annealed Densification Schedule) &mdash;
-        decays the split cadence with phase progress
-        $\Delta t(\phi) \in \{100, 250, 500\}$ to eliminate late-stage
-        overhead.
-      </p>
-      <p>
-        <strong>PSA-VCD</strong> (Perceptual Structure-Aware VCD) &mdash;
-        augments the $L_1$-based importance map with edge-weighted local
-        SSIM error, biasing split decisions toward perceptually salient
-        regions.
+        The clone, split and pruning rules are inherited unchanged; PSA alters
+        only the importance map from which the densification and pruning
+        scores are computed.
       </p>
     </div>
   </section>
@@ -129,8 +138,9 @@
   <section class="section">
     <h2>Main Results</h2>
     <p class="table-note">
-      Mip-NeRF 360 benchmark. Higher PSNR, SSIM, and FPS are better; lower
-      LPIPS is better. The last row is our method, highlighted in blue.
+      Mip-NeRF&nbsp;360 benchmark, nine-scene means. Higher PSNR and SSIM are
+      better; lower LPIPS is better. Baseline figures are those reported in the
+      corresponding publications. The last row is our method.
     </p>
     <div class="table-wrapper">
       <table>
@@ -141,33 +151,31 @@
             <th>SSIM &uarr;</th>
             <th>LPIPS &darr;</th>
             <th>$N_{\mathrm{GS}}$</th>
-            <th>FPS &uarr;</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>3DGS</td><td>27.53</td><td>0.812</td><td>0.221</td><td>2.63&nbsp;M</td><td>146</td></tr>
-          <tr><td>Mini-Splatting</td><td>27.32</td><td>0.821</td><td>0.217</td><td>0.53&nbsp;M</td><td>567</td></tr>
-          <tr><td>Speedy-splat</td><td>26.91</td><td>0.781</td><td>0.295</td><td>0.30&nbsp;M</td><td>552</td></tr>
-          <tr><td>Taming-3DGS</td><td>27.48</td><td>0.794</td><td>0.261</td><td>0.68&nbsp;M</td><td>221</td></tr>
-          <tr><td>DashGaussian</td><td>27.73</td><td>0.817</td><td>0.218</td><td>2.40&nbsp;M</td><td>155</td></tr>
-          <tr class="section-divider"><td colspan="6"></td></tr>
-          <tr><td>FastGS</td><td>27.56</td><td>0.797</td><td>0.261</td><td>0.40&nbsp;M</td><td>579</td></tr>
-          <tr><td>FastGS-Big</td><td>27.93</td><td>0.820</td><td>0.216</td><td>1.15&nbsp;M</td><td>469</td></tr>
-          <tr class="section-divider"><td colspan="6"></td></tr>
+          <tr><td>3DGS</td><td>27.53</td><td>0.812</td><td>0.221</td><td>2.63&nbsp;M</td></tr>
+          <tr><td>Mini-Splatting</td><td>27.32</td><td>0.821</td><td>0.217</td><td>0.53&nbsp;M</td></tr>
+          <tr><td>Speedy-Splat</td><td>26.91</td><td>0.781</td><td>0.295</td><td>0.30&nbsp;M</td></tr>
+          <tr><td>Taming-3DGS</td><td>27.48</td><td>0.794</td><td>0.261</td><td>0.68&nbsp;M</td></tr>
+          <tr><td>DashGaussian</td><td>27.73</td><td>0.817</td><td>0.218</td><td>2.40&nbsp;M</td></tr>
+          <tr class="section-divider"><td colspan="5"></td></tr>
+          <tr><td>FastGS</td><td>27.56</td><td>0.797</td><td>0.261</td><td>0.40&nbsp;M</td></tr>
+          <tr><td>FastGS-Big</td><td>27.93</td><td>0.820</td><td>0.216</td><td>1.15&nbsp;M</td></tr>
+          <tr class="section-divider"><td colspan="5"></td></tr>
           <tr class="ours-row">
             <td><strong>FastGS-Adaptive&nbsp;(Ours)</strong></td>
-            <td class="best">28.09</td>
-            <td class="best">0.823</td>
-            <td class="best">0.211</td>
-            <td>1.58&nbsp;M</td>
-            <td class="best">689</td>
+            <td class="best">28.12</td>
+            <td class="best">0.825</td>
+            <td class="best">0.205</td>
+            <td>1.93&nbsp;M</td>
           </tr>
         </tbody>
       </table>
     </div>
     <p class="table-footnote">
-      FastGS-Adaptive achieves the best PSNR, SSIM, LPIPS, and FPS on the
-      Mip-NeRF&nbsp;360 benchmark.
+      FastGS-Adaptive attains the best value on all three quality metrics,
+      improving on 8 of the 9 scenes over FastGS-Big.
     </p>
   </section>
 
@@ -209,7 +217,7 @@
   </section>
 
   <footer class="footer">
-    <p>&copy; 2026 &middot; Anonymous submission &middot; Static site</p>
+    <p>&copy; 2026 &middot; Hana L. Goshu, Tadesse G. Wakjira, Kin-Man Lam</p>
   </footer>
 
 </body>
