@@ -27,10 +27,13 @@
 
 **Hana L. Goshu<sup>1</sup> &nbsp;&middot;&nbsp;
 Tadesse G. Wakjira<sup>2</sup> &nbsp;&middot;&nbsp;
+Mostafa Fouda<sup>3,4</sup> &nbsp;&middot;&nbsp;
 Kin-Man Lam<sup>1</sup>**
 
 <sup>1</sup> The Hong Kong Polytechnic University &nbsp;&middot;&nbsp;
-<sup>2</sup> Kennesaw State University
+<sup>2</sup> Kennesaw State University &nbsp;&middot;&nbsp;
+<sup>3</sup> Idaho State University &nbsp;&middot;&nbsp;
+<sup>4</sup> Tohoku University
 
 </div>
 
